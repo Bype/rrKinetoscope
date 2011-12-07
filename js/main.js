@@ -1,5 +1,26 @@
 /**
- * @author David Olivari
+ *    rrKinetoscope
+ *    webgl video viewer
+ *
+ *
+ *    Copyright (c) 2011, David Olivari
+ *    All rights reserved.
+ *
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * 	  Intensively based on examples from : https://github.com/mrdoob/three.js
+ *
  */
 
 var img_list = ['zat1_jour1', 'zat1_jour2', 'zat1_jour3', 'zat2_jour1', 'zat2_jour2', 'zat2_jour3', 'zat3_jour1', 'zat3_jour2'];
@@ -32,6 +53,9 @@ $(document).ready(function() {
 
 	var seekingPos = false;
 	var userSeeking = false;
+
+	var startTimeStamp = 0;
+
 	init();
 	animate();
 
@@ -180,11 +204,62 @@ $(document).ready(function() {
 
 	}
 
-	function pickStart(x, y) {
-		mouse.x = (x / window.innerWidth ) * 2 - 1;
-		mouse.y = -(y / window.innerHeight ) * 2 + 1;
+	function startVideo(anIntersectedObj) {
+		if(INTERSECTED) {
+			video.pause();
+			video.currentTime = video.initialTime;
+			INTERSECTED.material = savedMaterial;
+			animMesh.push(INTERSECTED);
+		}
+		INTERSECTED = anIntersectedObj;
+		video.setAttribute('src', 'stream/' + INTERSECTED.name + '.webm');
+		targetCamera.x = INTERSECTED.position.x;
+		targetCamera.y = INTERSECTED.position.y;
+		targetCamera.z = 250;
+		savedMaterial = INTERSECTED.material;
+		INTERSECTED.material = materialV;
+
+		if(video.paused)
+			video.play();
+
+	}
+
+	function stopVideo() {
+		if(INTERSECTED) {
+			INTERSECTED.material = savedMaterial;
+			animMesh.push(INTERSECTED);
+		}
+		INTERSECTED = null;
+		video.pause();
+		targetCamera.z = 500;
+	}
+
+	function seekVideo() {
+		if(INTERSECTED) {
+			video.pause();
+			cubeMesh.position = INTERSECTED.position.clone();
+			sphereMesh.position.y = cubeMesh.position.y;
+			sphereMesh.position.z = cubeMesh.position.z + 1;
+			sphereMesh.rotation.x = 0;
+			sphereMesh.rotation.y = 0;
+		}
+	}
+
+	function endSeek() {
+		if(video.paused) {
+			video.play();
+		}
+	}
+
+	var findVideo = null;
+
+	function pickStart(x, y, aTimestamp) {
+		startTimeStamp = aTimestamp;
 		mousetrack.x = x;
 		mousetrack.x = y;
+
+		mouse.x = (x / window.innerWidth ) * 2 - 1;
+		mouse.y = -(y / window.innerHeight ) * 2 + 1;
 		var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
 		projector.unprojectVector(vector, camera);
 
@@ -193,66 +268,37 @@ $(document).ready(function() {
 		var ray = new THREE.Ray(camera.position, normVector);
 
 		var intersects = ray.intersectScene(scene);
-
+		findVideo = null;
 		if(intersects.length > 0) {
+			// Intersection
 			if(INTERSECTED != intersects[0].object) {
-				if(INTERSECTED) {
-					video.pause();
-					video.currentTime = video.initialTime;
-					INTERSECTED.material = savedMaterial;
-					animMesh.push(INTERSECTED);
-				}
-				INTERSECTED = intersects[0].object;
-				video.setAttribute('src', 'stream/' + INTERSECTED.name + '.webm');
-				targetCamera.x = INTERSECTED.position.x;
-				targetCamera.y = INTERSECTED.position.y;
-				targetCamera.z = 250;
-				savedMaterial = INTERSECTED.material;
-				INTERSECTED.material = materialV;
-
-				if(video.paused)
-					video.play();
-				//INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-				//INTERSECTED.material.color.setHex(0x606060);
-
+				// New intersected object
+				findVideo = intersects[0].object;
 			} else {
-				if(video.paused)
-					video.play();
-				else {
-					video.pause();
-					cubeMesh.position = INTERSECTED.position.clone();
-					sphereMesh.position.y = cubeMesh.position.y;
-					sphereMesh.position.z = cubeMesh.position.z + 1;
-					sphereMesh.rotation.x = 0;
-					sphereMesh.rotation.y = 0;
-				}
+				// Current intersected object
+				seekVideo();
 			}
 
 		} else {
+			stopVideo();
 
-			if(INTERSECTED) {
-				INTERSECTED.material = savedMaterial;
-				animMesh.push(INTERSECTED);
-			}
-			INTERSECTED = null;
-			video.pause();
-			video.currentTime = video.initialTime;
-
-			targetCamera.z = 500;
 		}
 	}
 
-	function pickStop(x, y) {
+	function pickStop(x, y, timestamp) {
 		mousetrack.x = x;
 		mousetrack.x = y;
-		if(INTERSECTED) {
-			if(video.paused) {
-				video.play();
-				cubeMesh.position.z = 1000;
+		if(300 < (timestamp - startTimeStamp)) {
+			if(INTERSECTED) {
+				endSeek();
 			}
+			userSeeking = false;
+		} else {
+			// Tap touch
+			if(findVideo)
+				startVideo(findVideo);
 		}
-		cubeMesh.position.z = 1000;
-		userSeeking = false;
+
 	}
 
 	function pickMove(x, y) {
@@ -282,30 +328,37 @@ $(document).ready(function() {
 	});
 	video.addEventListener('seeked', function(event) {
 		seekingPos = false;
+		cubeMesh.position.z = 1000;
 	});
+	var startTimeStamp = 0;
 	document.addEventListener('touchstart', function(event) {
-		pickStart(event.targetTouches[0].pageX, event.targetTouches[0].pageY);
+
+		pickStart(event.targetTouches[0].pageX, event.targetTouches[0].pageY, event.timeStamp);
 	});
 
 	document.addEventListener('touchend', function(event) {
-		pickStop(event.changedTouches[0].pageX, event.changedTouches[0].pageY);
+		pickStop(event.changedTouches[0].pageX, event.changedTouches[0].pageY, event.timeStamp);
 	});
 	document.addEventListener('touchmove', function(event) {
 		pickMove(event.targetTouches[0].pageX, event.targetTouches[0].pageY);
 	});
+	var mouseDown = false;
 
 	document.addEventListener('mousemove', function(event) {
 		event.preventDefault();
-		pickMove(event.clientX, event.clientY);
+		if(mouseDown)
+			pickMove(event.clientX, event.clientY);
 	});
 
 	document.addEventListener('mouseup', function(event) {
 		event.preventDefault();
-		pickStop(event.clientX, event.clientY);
+		mouseDown = false;
+		pickStop(event.clientX, event.clientY, event.timeStamp);
 	});
 
 	document.addEventListener('mousedown', function(event) {
+		mouseDown = true;
 		event.preventDefault();
-		pickStart(event.clientX, event.clientY);
+		pickStart(event.clientX, event.clientY, event.timeStamp);
 	});
 });
