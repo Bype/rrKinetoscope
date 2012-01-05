@@ -88,7 +88,7 @@ $(document).ready(function() {
 		for(var i = 0; i < 64; i++) {
 			imgUrl = img_list[Math.floor(Math.random() * img_list.length)];
 			material[i] = new THREE.MeshBasicMaterial({
-				map : THREE.ImageUtils.loadTexture('stream/img/ttl_' + imgUrl + '.png')
+				map : THREE.ImageUtils.loadTexture('stream/img/sttl_' + imgUrl + '.webp')		
 			});
 			geometry[i] = new THREE.PlaneGeometry(128, 72);
 			mesh[i] = new THREE.Mesh(geometry[i], material[i]);
@@ -141,8 +141,20 @@ $(document).ready(function() {
 		renderer = new THREE.WebGLRenderer({
 			antialias : true
 		});
-		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setSize(document.width, document.height);
 		document.body.appendChild(renderer.domElement);
+
+	}
+
+
+	window.addEventListener('resize', onWindowResize, false);
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize(window.innerWidth, window.innerHeight);
 
 	}
 
@@ -231,6 +243,7 @@ $(document).ready(function() {
 		}
 		INTERSECTED = null;
 		video.pause();
+		video.setAttribute('src', '');
 		targetCamera.z = 500;
 	}
 
