@@ -88,7 +88,7 @@ $(document).ready(function() {
 		for(var i = 0; i < 64; i++) {
 			imgUrl = img_list[Math.floor(Math.random() * img_list.length)];
 			material[i] = new THREE.MeshBasicMaterial({
-				map : THREE.ImageUtils.loadTexture('stream/img/sttl_' + imgUrl + '.webp')		
+				map : THREE.ImageUtils.loadTexture('stream/img/sttl_' + imgUrl + '.webp')
 			});
 			geometry[i] = new THREE.PlaneGeometry(128, 72);
 			mesh[i] = new THREE.Mesh(geometry[i], material[i]);
@@ -98,9 +98,9 @@ $(document).ready(function() {
 			scene.add(mesh[i]);
 		};
 
-		var cubePlus = new THREE.PlaneGeometry(112, 2);
+		var cubePlus = new THREE.PlaneGeometry(8, 8);
 		cubeMesh = new THREE.Mesh(cubePlus, new THREE.MeshBasicMaterial({
-			//map : THREE.ImageUtils.loadTexture('img/play.png'),
+			map : THREE.ImageUtils.loadTexture('img/play.png'),
 			color : 0x606060,
 			opacity : .7,
 			transparent : true
@@ -109,18 +109,6 @@ $(document).ready(function() {
 		cubeMesh.position.y = 0;
 		cubeMesh.position.z = 1000;
 		scene.add(cubeMesh);
-
-		var spherePlus = new THREE.CubeGeometry(4, 4, 4);
-		sphereMesh = new THREE.Mesh(spherePlus, new THREE.MeshLambertMaterial({
-			//map : THREE.ImageUtils.loadTexture('img/play.png'),
-			color : 0x606060,
-			opacity : .5,
-			transparent : true
-		}));
-		sphereMesh.position.x = 0;
-		sphereMesh.position.y = 0;
-		sphereMesh.position.z = 1000;
-		scene.add(sphereMesh);
 
 		/*
 		 var light = new THREE.PointLight(0xFFFFFF);
@@ -167,22 +155,9 @@ $(document).ready(function() {
 		// find intersections
 
 		if(video.readyState === video.HAVE_ENOUGH_DATA) {
-
 			imageContext.drawImage(video, 0, 0);
-
 			if(texture)
 				texture.needsUpdate = true;
-
-		}
-		if(seekingPos) {
-			if(INTERSECTED) {
-				sphereMesh.rotation.x += 0.01;
-				sphereMesh.rotation.y -= 0.02;
-			}
-		} else {
-			if(userSeeking != true)
-				if(sphereMesh.position.z < 500)
-					sphereMesh.position.z += sphereMesh.position.z / 16;
 		}
 
 		function gotoTarget(current, target) {
@@ -197,6 +172,14 @@ $(document).ready(function() {
 		camera.position.x = gotoTarget(camera.position.x, targetCamera.x);
 		camera.position.y = gotoTarget(camera.position.y, targetCamera.y);
 		camera.position.z = gotoTarget(camera.position.z, targetCamera.z);
+
+		if((video.paused) && (INTERSECTED != null)) {
+			if(cubeMesh.position.z < 190)
+				cubeMesh.position.z += (190 - cubeMesh.position.z) / 4;
+		} else {
+			if(-10 < cubeMesh.position.z)
+				cubeMesh.position.z -= 16;
+		}
 
 		for(var i = 0; i < animMesh.length; i++) {
 			if(0 < animMesh[i].position.z)
@@ -219,7 +202,7 @@ $(document).ready(function() {
 	function startVideo(anIntersectedObj) {
 		if(INTERSECTED) {
 			video.pause();
-			video.currentTime = video.initialTime;
+			//			video.currentTime = video.initialTime;
 			INTERSECTED.material = savedMaterial;
 			animMesh.push(INTERSECTED);
 		}
@@ -247,83 +230,55 @@ $(document).ready(function() {
 		targetCamera.z = 500;
 	}
 
-	function seekVideo() {
-		if(INTERSECTED) {
-			video.pause();
-			cubeMesh.position = INTERSECTED.position.clone();
-			sphereMesh.position.y = cubeMesh.position.y;
-			sphereMesh.position.z = cubeMesh.position.z + 1;
-			sphereMesh.rotation.x = 0;
-			sphereMesh.rotation.y = 0;
-		}
-	}
-
-	function endSeek() {
-		if(video.paused) {
-			video.play();
-		}
-	}
-
 	var findVideo = null;
 
 	function pickStart(x, y, aTimestamp) {
 		startTimeStamp = aTimestamp;
-		mousetrack.x = x;
-		mousetrack.x = y;
 
-		mouse.x = (x / window.innerWidth ) * 2 - 1;
-		mouse.y = -(y / window.innerHeight ) * 2 + 1;
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
-		projector.unprojectVector(vector, camera);
-
-		var normVector = vector.subSelf(camera.position).normalize();
-
-		var ray = new THREE.Ray(camera.position, normVector);
-
-		var intersects = ray.intersectScene(scene);
-		findVideo = null;
-		if(intersects.length > 0) {
-			// Intersection
-			if(INTERSECTED != intersects[0].object) {
-				// New intersected object
-				findVideo = intersects[0].object;
-			} else {
-				// Current intersected object
-				seekVideo();
-			}
-
-		} else {
-			stopVideo();
-
-		}
 	}
 
 	function pickStop(x, y, timestamp) {
 		mousetrack.x = x;
 		mousetrack.x = y;
-		if(300 < (timestamp - startTimeStamp)) {
-			if(INTERSECTED) {
-				endSeek();
-			}
-			userSeeking = false;
-		} else {
-			// Tap touch
-			if(findVideo)
-				startVideo(findVideo);
-		}
+		if((timestamp - startTimeStamp) < 500) {
 
+			mouse.x = (x / window.innerWidth ) * 2 - 1;
+			mouse.y = -(y / window.innerHeight ) * 2 + 1;
+			var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
+			projector.unprojectVector(vector, camera);
+
+			var normVector = vector.subSelf(camera.position).normalize();
+
+			var ray = new THREE.Ray(camera.position, normVector);
+
+			var intersects = ray.intersectScene(scene);
+			findVideo = null;
+			if(intersects.length > 0) {
+				// Intersection
+				if((INTERSECTED != intersects[0].object) && (cubeMesh != intersects[0].object)) {
+					// New intersected object
+					findVideo = intersects[0].object;
+					startVideo(findVideo);
+					cubeMesh.position = INTERSECTED.position.clone();
+					cubeMesh.position.z -= 100;
+				} else {
+					// Current intersected object
+					if(video.paused) {
+						video.play();
+					} else {
+						video.pause();
+					}
+				}
+			} else {
+				stopVideo();
+			}
+		}
 	}
 
 	function pickMove(x, y) {
 
 		if(INTERSECTED) {
-			if(video.paused) {
-				userSeeking = true;
-				video.currentTime = Math.floor(video.duration * x / window.innerWidth);
-				var newPos = 1.1 * (112 * x / window.innerWidth - 56);
-				if((-56 < newPos) && (newPos < 56))
-					sphereMesh.position.x = cubeMesh.position.x + newPos;
-			}
+
 		} else {
 			if(Math.abs(x - mousetrack.x) < 50)
 				targetCamera.x -= (x - mousetrack.x) / 2;
@@ -334,15 +289,6 @@ $(document).ready(function() {
 		mousetrack.y = y;
 	}
 
-
-	video.addEventListener('seeking', function(event) {
-		seekingPos = true;
-
-	});
-	video.addEventListener('seeked', function(event) {
-		seekingPos = false;
-		cubeMesh.position.z = 1000;
-	});
 	var startTimeStamp = 0;
 	document.addEventListener('touchstart', function(event) {
 
