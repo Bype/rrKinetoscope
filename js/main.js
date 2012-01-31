@@ -88,7 +88,7 @@ $(document).ready(function() {
 		for(var i = 0; i < 64; i++) {
 			imgUrl = img_list[Math.floor(Math.random() * img_list.length)];
 			material[i] = new THREE.MeshBasicMaterial({
-				map : THREE.ImageUtils.loadTexture('stream/img/sttl_' + imgUrl + '.webp')
+				map : THREE.ImageUtils.loadTexture('stream/img/ttl_' + imgUrl + '.jpg')
 			});
 			geometry[i] = new THREE.PlaneGeometry(128, 72);
 			mesh[i] = new THREE.Mesh(geometry[i], material[i]);
@@ -210,7 +210,7 @@ $(document).ready(function() {
 		video.setAttribute('src', 'stream/' + INTERSECTED.name + '.webm');
 		targetCamera.x = INTERSECTED.position.x;
 		targetCamera.y = INTERSECTED.position.y;
-		targetCamera.z = 250;
+		targetCamera.z = 280;
 		savedMaterial = INTERSECTED.material;
 		INTERSECTED.material = materialV;
 
@@ -291,7 +291,6 @@ $(document).ready(function() {
 
 	var startTimeStamp = 0;
 	document.addEventListener('touchstart', function(event) {
-
 		pickStart(event.targetTouches[0].pageX, event.targetTouches[0].pageY, event.timeStamp);
 	});
 
@@ -305,19 +304,25 @@ $(document).ready(function() {
 
 	document.addEventListener('mousemove', function(event) {
 		event.preventDefault();
-		if(mouseDown)
-			pickMove(event.clientX, event.clientY);
+		return false;
 	});
 
 	document.addEventListener('mouseup', function(event) {
 		event.preventDefault();
-		mouseDown = false;
-		pickStop(event.clientX, event.clientY, event.timeStamp);
+		return false;
 	});
 
 	document.addEventListener('mousedown', function(event) {
-		mouseDown = true;
 		event.preventDefault();
-		pickStart(event.clientX, event.clientY, event.timeStamp);
+		return false;
+	});
+
+	document.addEventListener('dblclick', function(event) {
+		event.preventDefault();
+		return false;
+	});
+	document.addEventListener('contextmenu', function(event) {
+		event.preventDefault();
+		return false;
 	});
 });
