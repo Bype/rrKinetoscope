@@ -88,13 +88,13 @@ $(document).ready(function() {
 		for(var i = 0; i < 64; i++) {
 			imgUrl = img_list[Math.floor(Math.random() * img_list.length)];
 			material[i] = new THREE.MeshBasicMaterial({
-				map : THREE.ImageUtils.loadTexture('stream/img/ttl_' + imgUrl + '.jpg')
+				map : THREE.ImageUtils.loadTexture('stream/img/sttl_' + imgUrl + '.webp')
 			});
-			geometry[i] = new THREE.PlaneGeometry(128, 72);
+			geometry[i] = new THREE.PlaneGeometry(128,72);
 			mesh[i] = new THREE.Mesh(geometry[i], material[i]);
 			mesh[i].name = imgUrl;
-			mesh[i].position.x = 476 - 144 * (i % 8);
-			mesh[i].position.y = 360 - 88 * Math.floor(i / 8);
+			mesh[i].position.x = 476 - 160 * (i % 8);
+			mesh[i].position.y = 360 - 100 * Math.floor(i / 8);
 			scene.add(mesh[i]);
 		};
 
@@ -129,20 +129,8 @@ $(document).ready(function() {
 		renderer = new THREE.WebGLRenderer({
 			antialias : true
 		});
-		renderer.setSize(document.width, document.height);
-		document.body.appendChild(renderer.domElement);
-
-	}
-
-
-	window.addEventListener('resize', onWindowResize, false);
-
-	function onWindowResize() {
-
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-
 		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
 
 	}
 
@@ -238,39 +226,41 @@ $(document).ready(function() {
 	}
 
 	function pickStop(x, y, timestamp) {
-		mousetrack.x = x;
-		mousetrack.x = y;
-		if((timestamp - startTimeStamp) < 500) {
+		if((x < window.innerWidth) && (y < window.innerHeight)) {
+			mousetrack.x = x;
+			mousetrack.x = y;
+			if((timestamp - startTimeStamp) < 500) {
 
-			mouse.x = (x / window.innerWidth ) * 2 - 1;
-			mouse.y = -(y / window.innerHeight ) * 2 + 1;
-			var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
-			projector.unprojectVector(vector, camera);
+				mouse.x = (x / window.innerWidth ) * 2 - 1;
+				mouse.y = -(y / window.innerHeight ) * 2 + 1;
+				var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
+				projector.unprojectVector(vector, camera);
 
-			var normVector = vector.subSelf(camera.position).normalize();
+				var normVector = vector.subSelf(camera.position).normalize();
 
-			var ray = new THREE.Ray(camera.position, normVector);
+				var ray = new THREE.Ray(camera.position, normVector);
 
-			var intersects = ray.intersectScene(scene);
-			findVideo = null;
-			if(intersects.length > 0) {
-				// Intersection
-				if((INTERSECTED != intersects[0].object) && (cubeMesh != intersects[0].object)) {
-					// New intersected object
-					findVideo = intersects[0].object;
-					startVideo(findVideo);
-					cubeMesh.position = INTERSECTED.position.clone();
-					cubeMesh.position.z -= 100;
-				} else {
-					// Current intersected object
-					if(video.paused) {
-						video.play();
+				var intersects = ray.intersectScene(scene);
+				findVideo = null;
+				if(intersects.length > 0) {
+					// Intersection
+					if((INTERSECTED != intersects[0].object) && (cubeMesh != intersects[0].object)) {
+						// New intersected object
+						findVideo = intersects[0].object;
+						startVideo(findVideo);
+						cubeMesh.position = INTERSECTED.position.clone();
+						cubeMesh.position.z -= 100;
 					} else {
-						video.pause();
+						// Current intersected object
+						if(video.paused) {
+							video.play();
+						} else {
+							video.pause();
+						}
 					}
+				} else {
+					stopVideo();
 				}
-			} else {
-				stopVideo();
 			}
 		}
 	}
