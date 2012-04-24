@@ -127,7 +127,9 @@ $(document).ready(function() {
 		renderer = new THREE.WebGLRenderer({
 			antialias : true
 		});
-		renderer.setSize($(document).width(), $(document).height());
+		camera.aspect = 1780 / 1080;
+                camera.updateProjectionMatrix();
+		renderer.setSize(1780,1080);
 		document.body.appendChild(renderer.domElement);
 
 	}
@@ -318,11 +320,12 @@ $(document).ready(function() {
 	animate();
 
         window.addEventListener('resize', onWindowResize, false);
- 
+/* 
         function onWindowResize() {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
         }
+*/
 
 });
