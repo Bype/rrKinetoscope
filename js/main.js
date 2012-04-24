@@ -1,3 +1,4 @@
+
 /**
  *    rrKinetoscope
  *    webgl video viewer
@@ -56,9 +57,6 @@ $(document).ready(function() {
 
 	var startTimeStamp = 0;
 
-	init();
-	animate();
-
 	function init() {
 		scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 10000);
@@ -88,7 +86,7 @@ $(document).ready(function() {
 		for(var i = 0; i < 64; i++) {
 			imgUrl = img_list[Math.floor(Math.random() * img_list.length)];
 			material[i] = new THREE.MeshBasicMaterial({
-				map : THREE.ImageUtils.loadTexture('stream/img/sttl_' + imgUrl + '.webp')
+				map : THREE.ImageUtils.loadTexture('stream/img/ttl_' + imgUrl + '.jpg')
 			});
 			geometry[i] = new THREE.PlaneGeometry(128,72);
 			mesh[i] = new THREE.Mesh(geometry[i], material[i]);
@@ -129,10 +127,11 @@ $(document).ready(function() {
 		renderer = new THREE.WebGLRenderer({
 			antialias : true
 		});
-		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setSize($(document).width(), $(document).height());
 		document.body.appendChild(renderer.domElement);
 
 	}
+	
 
 	function animate() {
 		requestAnimationFrame(animate);
@@ -190,7 +189,7 @@ $(document).ready(function() {
 	function startVideo(anIntersectedObj) {
 		if(INTERSECTED) {
 			video.pause();
-			//			video.currentTime = video.initialTime;
+			//video.currentTime = video.initialTime;
 			INTERSECTED.material = savedMaterial;
 			animMesh.push(INTERSECTED);
 		}
@@ -315,4 +314,15 @@ $(document).ready(function() {
 		event.preventDefault();
 		return false;
 	});
+	init();
+	animate();
+
+        window.addEventListener('resize', onWindowResize, false);
+ 
+        function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
 });
