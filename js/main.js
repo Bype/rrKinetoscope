@@ -1,4 +1,3 @@
-
 /**
  *    rrKinetoscope
  *    webgl video viewer
@@ -59,13 +58,15 @@ $(document).ready(function() {
 
 	function init() {
 		scene = new THREE.Scene();
-		camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 10000);
+		camera = new THREE.PerspectiveCamera(35, $(document).width() / $(document).height(), 1, 10000);
 		mouse2d = new THREE.Vector3(0, 0, 1);
 
 		camera.position.x = 136;
 		camera.position.y = -80;
 		camera.position.z = 500;
 		camera.rotation.x = 0;
+		camera.rotation.y = 0;
+		camera.rotation.z = 0;
 		scene.add(camera);
 		video = document.getElementById('video');
 		video.load();
@@ -88,11 +89,12 @@ $(document).ready(function() {
 			material[i] = new THREE.MeshBasicMaterial({
 				map : THREE.ImageUtils.loadTexture('stream/img/ttl_' + imgUrl + '.jpg')
 			});
-			geometry[i] = new THREE.PlaneGeometry(128,72);
+			geometry[i] = new THREE.PlaneGeometry(128, 72);
 			mesh[i] = new THREE.Mesh(geometry[i], material[i]);
 			mesh[i].name = imgUrl;
 			mesh[i].position.x = 476 - 160 * (i % 8);
 			mesh[i].position.y = 360 - 100 * Math.floor(i / 8);
+			mesh[i].rotation.x = 0;
 			scene.add(mesh[i]);
 		};
 
@@ -128,10 +130,13 @@ $(document).ready(function() {
 			antialias : true
 		});
 		renderer.setSize($(document).width(), $(document).height());
+		$(window).unload(function() {
+			$(renderer.domElement).remove();
+			renderer = null;
+		});
 		document.body.appendChild(renderer.domElement);
 
 	}
-	
 
 	function animate() {
 		requestAnimationFrame(animate);
@@ -183,7 +188,6 @@ $(document).ready(function() {
 		sun.position.z = 500;
 		sun.position.normalize();
 		renderer.render(scene, camera);
-
 	}
 
 	function startVideo(anIntersectedObj) {
@@ -317,12 +321,12 @@ $(document).ready(function() {
 	init();
 	animate();
 
-        window.addEventListener('resize', onWindowResize, false);
- 
-        function onWindowResize() {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+	window.addEventListener('resize', onWindowResize, false);
+
+	function onWindowResize() {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+	}
 
 });
