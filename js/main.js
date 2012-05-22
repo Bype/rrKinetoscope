@@ -134,6 +134,7 @@ $(document).ready(function() {
 			$(renderer.domElement).remove();
 			renderer = null;
 		});
+
 		document.body.appendChild(renderer.domElement);
 
 	}
@@ -229,13 +230,13 @@ $(document).ready(function() {
 	}
 
 	function pickStop(x, y, timestamp) {
-		if((x < window.innerWidth) && (y < window.innerHeight)) {
+		if((x < $(document).width()) && (y < $(document).height())) {
 			mousetrack.x = x;
 			mousetrack.x = y;
 			if((timestamp - startTimeStamp) < 500) {
 
-				mouse.x = (x / window.innerWidth ) * 2 - 1;
-				mouse.y = -(y / window.innerHeight ) * 2 + 1;
+				mouse.x = (x / $(document).width() ) * 2 - 1;
+				mouse.y = -(y / $(document).height() ) * 2 + 1;
 				var vector = new THREE.Vector3(mouse.x, mouse.y, 1);
 				projector.unprojectVector(vector, camera);
 
@@ -324,9 +325,9 @@ $(document).ready(function() {
 	window.addEventListener('resize', onWindowResize, false);
 
 	function onWindowResize() {
-		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.aspect = $(document).width() / $(document).height();
 		camera.updateProjectionMatrix();
-		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setSize($(document).width(), $(document).height());
 	}
 
 });
