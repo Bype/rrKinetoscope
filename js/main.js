@@ -23,7 +23,7 @@
  *
  */
 
-var img_list = ['zat1_jour1', 'zat1_jour2', 'zat1_jour3', 'zat2_jour1', 'zat2_jour2', 'zat2_jour3', 'zat3_jour1', 'zat3_jour2'];
+var img_list = ["An_Impromptu_Session-Daft_Pianists", "Après_Barack_Obama,_François_Hollande_reprend_Get_Lucky_de_Daft_Punk_(ft_Pharrell)", "Barack_Obama_Singing_Get_Lucky_by_Daft_Punk_(ft._Pharrell)", "Billie_Jean_Get_Lucky_(Noy_Alooshe_Mash_Up)-Daft_Punk_Vs_Michael_Jackson", "Cat_Lucky", "C'est_bon_pour_le_moral", "CLIP_Evolution_of_Get_Lucky_[Daft_Punk_Chronologic_Cover]", "Daft_Punk_ft_Rodgers,_Pharrell_&_Jackson-DJ_Sandstorm_Mashup", "Daft_Punk_'Get_Lucky'_Covers_Mix_(@TheKevinRyder_remix)", "Être_Chanceux_(Get_Lucky_french_version)", "Evolution_of_Get_Lucky_[Daft_Punk_Chronologic_cover_by_PV_NOVA]", "Get_Lucky_(Acapella_&_Beatbox_Cover)", "Get_Lucky_(Acapella_Cover_by_Oliver_Age_24)", "Get_Lucky_-_A_Cappela_Cover-JB_Craipeau", "Get_Lucky_(Accordion_Cover_by_Olavsky)", "Get_Lucky_acoustic_cover_(tunisian_style)", "Get_Lucky_(A_cover_by_Andre_B.)", "Get_Lucky_-_Bass_Cover", "Get_Lucky_-_Beats_Antique_Cover_-_feat._Charles_Butler_-_Video_MasHuP", "Get_Lucky_(Chacarera)___Despiertos_para_ponerla_(HD)", "Get_Lucky-choir!_choir!_choir!_sings_Daft_Punk_(ft._Pharrell)", "Get_Lucky_cover_(Electronic_vs._Live_Instruments)_by_KNOWER", "Get_Lucky_(Daft_Punk_Cover)-Brett_Domino_Trio", "Get_Lucky_(Daft_Punk_ft._Pharrell)-The_Sons_of_Pitches", "Get_Lucky_-_feat._Charles_Butler_-_(Beats_Antique_Cover)", "Get_Lucky_(Full_Video)", "Get_Lucky-George_Barnett", "Get_Lucky_(Grand_Piano_Cover)", "Get_Lucky_LIVE_Cover_w__Looping", "Get_Lucky_(Miracles_of_Modern_Science_orchestral_cover)", "Get_Lucky", "GET_LUCKY", "Get_Lucky_Piano_Cover-Daft_Punk_Pianist", "Get_Lucky_-_Saxophone_Duet", "GET_LUCKY_-_SOUL_TRAIN_LINE_1970_-_2013", "Get_Lucky_vs._Bee_Gees_&_Justice", "Shredded_Version_(Parody_by_Topito.com)", "White_People_Dancing_to_Daft_Punk_(Get_Lucky)"];
 
 $(document).ready(function() {
 
@@ -84,16 +84,16 @@ $(document).ready(function() {
 			overdraw : true
 		});
 
-		for(var i = 0; i < 64; i++) {
-			imgUrl = img_list[Math.floor(Math.random() * img_list.length)];
+		for (var i = 0; i < 128; i++) {
+			imgUrl = img_list[Math.floor(i% img_list.length)];
 			material[i] = new THREE.MeshBasicMaterial({
-				map : THREE.ImageUtils.loadTexture('stream/img/ttl_' + imgUrl + '.jpg')
+				map : THREE.ImageUtils.loadTexture('stream/img/ttl_' + imgUrl + '.png')
 			});
 			geometry[i] = new THREE.PlaneGeometry(128, 72);
 			mesh[i] = new THREE.Mesh(geometry[i], material[i]);
 			mesh[i].name = imgUrl;
 			mesh[i].position.x = 476 - 160 * (i % 8);
-			mesh[i].position.y = 360 - 100 * Math.floor(i / 8);
+			mesh[i].position.y = 600 - 100 * Math.floor(i / 8);
 			mesh[i].rotation.x = 0;
 			scene.add(mesh[i]);
 		};
@@ -147,16 +147,16 @@ $(document).ready(function() {
 	function render() {
 		// find intersections
 
-		if(video.readyState === video.HAVE_ENOUGH_DATA) {
+		if (video.readyState === video.HAVE_ENOUGH_DATA) {
 			imageContext.drawImage(video, 0, 0);
-			if(texture)
+			if (texture)
 				texture.needsUpdate = true;
 		}
 
 		function gotoTarget(current, target) {
-			if(current < target)
+			if (current < target)
 				current += (target - current) / 16;
-			if(target < current)
+			if (target < current)
 				current -= (current - target) / 16;
 			return current;
 		}
@@ -166,23 +166,23 @@ $(document).ready(function() {
 		camera.position.y = gotoTarget(camera.position.y, targetCamera.y);
 		camera.position.z = gotoTarget(camera.position.z, targetCamera.z);
 
-		if((video.paused) && (INTERSECTED != null)) {
-			if(cubeMesh.position.z < 190)
+		if ((video.paused) && (INTERSECTED != null)) {
+			if (cubeMesh.position.z < 190)
 				cubeMesh.position.z += (190 - cubeMesh.position.z) / 4;
 		} else {
-			if(-10 < cubeMesh.position.z)
+			if (-10 < cubeMesh.position.z)
 				cubeMesh.position.z -= 16;
 		}
 
-		for(var i = 0; i < animMesh.length; i++) {
-			if(0 < animMesh[i].position.z)
+		for (var i = 0; i < animMesh.length; i++) {
+			if (0 < animMesh[i].position.z)
 				animMesh[i].position.z -= animMesh[i].position.z / 16;
 			else
 				animMesh.splice(i, 1);
 		}
 
-		if(INTERSECTED)
-			if(INTERSECTED.position.z < 120)
+		if (INTERSECTED)
+			if (INTERSECTED.position.z < 120)
 				INTERSECTED.position.z += (120 - INTERSECTED.position.z) / 4;
 
 		sun.position = camera.position.clone();
@@ -192,27 +192,27 @@ $(document).ready(function() {
 	}
 
 	function startVideo(anIntersectedObj) {
-		if(INTERSECTED) {
+		if (INTERSECTED) {
 			video.pause();
 			//video.currentTime = video.initialTime;
 			INTERSECTED.material = savedMaterial;
 			animMesh.push(INTERSECTED);
 		}
 		INTERSECTED = anIntersectedObj;
-		video.setAttribute('src', 'stream/' + INTERSECTED.name + '.webm');
+		video.setAttribute('src', 'stream/' + INTERSECTED.name + '.mp4');
 		targetCamera.x = INTERSECTED.position.x;
 		targetCamera.y = INTERSECTED.position.y;
-		targetCamera.z = 280;
+		targetCamera.z = 260;
 		savedMaterial = INTERSECTED.material;
 		INTERSECTED.material = materialV;
 
-		if(video.paused)
+		if (video.paused)
 			video.play();
 
 	}
 
 	function stopVideo() {
-		if(INTERSECTED) {
+		if (INTERSECTED) {
 			INTERSECTED.material = savedMaterial;
 			animMesh.push(INTERSECTED);
 		}
@@ -230,10 +230,10 @@ $(document).ready(function() {
 	}
 
 	function pickStop(x, y, timestamp) {
-		if((x < $(document).width()) && (y < $(document).height())) {
+		if ((x < $(document).width()) && (y < $(document).height())) {
 			mousetrack.x = x;
 			mousetrack.x = y;
-			if((timestamp - startTimeStamp) < 500) {
+			if ((timestamp - startTimeStamp) < 150) {
 
 				mouse.x = (x / $(document).width() ) * 2 - 1;
 				mouse.y = -(y / $(document).height() ) * 2 + 1;
@@ -246,9 +246,9 @@ $(document).ready(function() {
 
 				var intersects = ray.intersectScene(scene);
 				findVideo = null;
-				if(intersects.length > 0) {
+				if (intersects.length > 0) {
 					// Intersection
-					if((INTERSECTED != intersects[0].object) && (cubeMesh != intersects[0].object)) {
+					if ((INTERSECTED != intersects[0].object) && (cubeMesh != intersects[0].object)) {
 						// New intersected object
 						findVideo = intersects[0].object;
 						startVideo(findVideo);
@@ -256,7 +256,7 @@ $(document).ready(function() {
 						cubeMesh.position.z -= 100;
 					} else {
 						// Current intersected object
-						if(video.paused) {
+						if (video.paused) {
 							video.play();
 						} else {
 							video.pause();
@@ -271,13 +271,23 @@ $(document).ready(function() {
 
 	function pickMove(x, y) {
 
-		if(INTERSECTED) {
+		if (INTERSECTED) {
 
 		} else {
-			if(Math.abs(x - mousetrack.x) < 50)
+			if (Math.abs(x - mousetrack.x) < 50)
 				targetCamera.x -= (x - mousetrack.x) / 2;
-			if(Math.abs(y - mousetrack.y) < 50)
+			if (Math.abs(y - mousetrack.y) < 50)
 				targetCamera.y += (y - mousetrack.y) / 2;
+
+			if (500 < targetCamera.y)
+				targetCamera.y = 500;
+			if (targetCamera.y < -500)
+				targetCamera.y = -500;
+			if (targetCamera.x < -460)
+				targetCamera.x = -460;
+			if (300 < targetCamera.x)
+				targetCamera.x = 300;
+
 		}
 		mousetrack.x = x;
 		mousetrack.y = y;
@@ -285,39 +295,33 @@ $(document).ready(function() {
 
 	var startTimeStamp = 0;
 	document.addEventListener('touchstart', function(event) {
-		pickStart(event.targetTouches[0].pageX, event.targetTouches[0].pageY, event.timeStamp);
+		// pickStart(event.targetTouches[0].pageX, event.targetTouches[0].pageY, event.timeStamp);
 	});
 
 	document.addEventListener('touchend', function(event) {
-		pickStop(event.changedTouches[0].pageX, event.changedTouches[0].pageY, event.timeStamp);
+		// pickStop(event.changedTouches[0].pageX, event.changedTouches[0].pageY, event.timeStamp);
 	});
 	document.addEventListener('touchmove', function(event) {
-		pickMove(event.targetTouches[0].pageX, event.targetTouches[0].pageY);
+		// pickMove(event.targetTouches[0].pageX, event.targetTouches[0].pageY);
 	});
 	var mouseDown = false;
 
 	document.addEventListener('mousemove', function(event) {
 		event.preventDefault();
-		return false;
+		if (mouseDown)
+			pickMove(event.clientX, event.clientY);
 	});
 
 	document.addEventListener('mouseup', function(event) {
 		event.preventDefault();
-		return false;
+		mouseDown = false;
+		pickStop(event.clientX, event.clientY, event.timeStamp);
 	});
 
 	document.addEventListener('mousedown', function(event) {
+		mouseDown = true;
 		event.preventDefault();
-		return false;
-	});
-
-	document.addEventListener('dblclick', function(event) {
-		event.preventDefault();
-		return false;
-	});
-	document.addEventListener('contextmenu', function(event) {
-		event.preventDefault();
-		return false;
+		pickStart(event.clientX, event.clientY, event.timeStamp);
 	});
 	init();
 	animate();

@@ -8,8 +8,8 @@ import random
 filename = sys.argv[1]
 id4 = MP4(filename+'.mp4')
 season = id4['\xa9alb'][0]
-episode = id4['\xa9nam'][0]
-director = id4['\xa9ART'][0]
+title = id4['\xa9nam'][0]
+subtitle = id4['\xa9ART'][0]
 comment = id4['\xa9cmt'][0]
 
 yello=(236,208,120,240)
@@ -24,21 +24,24 @@ thumbnail = Image.open(filename+'.png')
 small = thumbnail.copy()
 small.thumbnail((16,9))
 bgcolor = small.getpixel((8,4))
-titleFrame = Image.new("RGBA", (1280, 160),bgcolor )
+titleFrame = Image.new("RGBA", (640, 60),(0,0,0,240))
 
-if(384 < sum(bgcolor) ):
+if(384 < sum(bgcolor)) :
     txtcolor=(32,32,32,200)
 else:
     txtcolor=(216,216,216,200)
 
-titleFont = ImageFont.truetype("Cabin-Bold-TTF.ttf", 50)
-subtitleFont = ImageFont.truetype("Cabin-Bold-TTF.ttf", 40)
-textFont = ImageFont.truetype("Cabin-Regular-TTF.ttf", 24)
+txtcolor=(255,255,255,255)
+
+if (len(title)<40):
+    titleFont = ImageFont.truetype("OSP-DIN.ttf", 35)
+else:
+    titleFont = ImageFont.truetype("OSP-DIN.ttf", 26)
+
+subtitleFont = ImageFont.truetype("OSP-DIN.ttf", 25)
+
 drawTitle = ImageDraw.Draw(titleFrame)
-drawTitle.text((16,8),season, font=titleFont, fill=txtcolor)
-drawTitle.text((16,54),director, font=subtitleFont, fill=txtcolor)
-drawTitle.text((16,104),comment[:120]+"...", font=textFont, fill=txtcolor)
-box = drawTitle.textsize(episode,font=titleFont)
-drawTitle.text((1264-box[0],8),episode, font=titleFont, fill=txtcolor)
-thumbnail.paste(titleFrame,(0,560),titleFrame)
+drawTitle.text((16,8),title, font=titleFont, fill=txtcolor)
+drawTitle.text(((624-9*len(subtitle)),20),subtitle, font=subtitleFont, fill=txtcolor)
+thumbnail.paste(titleFrame,(0,300),titleFrame)
 thumbnail.save('ttl_'+filename+'.png','PNG')
