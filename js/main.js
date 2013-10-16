@@ -85,7 +85,7 @@ $(document).ready(function() {
 		});
 
 		for (var i = 0; i < 128; i++) {
-			imgUrl = img_list[Math.floor(i% img_list.length)];
+			imgUrl = img_list[i % img_list.length];
 			material[i] = new THREE.MeshBasicMaterial({
 				map : THREE.ImageUtils.loadTexture('stream/img/ttl_' + imgUrl + '.png')
 			});
