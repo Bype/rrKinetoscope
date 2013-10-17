@@ -43,8 +43,8 @@ $(document).ready(function() {
 		y : 0
 	};
 
-	var defaultCamera = new THREE.Vector3(0, 0, 500);
-	var targetCamera = new THREE.Vector3(163, -80, 500);
+	var defaultCamera = new THREE.Vector3(0, 0, 700);
+	var targetCamera = new THREE.Vector3(163, -80, 700);
 
 	var video, image, imageContext, texture, materialV;
 	var savedMaterial;
@@ -63,7 +63,7 @@ $(document).ready(function() {
 
 		camera.position.x = 136;
 		camera.position.y = -80;
-		camera.position.z = 500;
+		camera.position.z = 800;
 		camera.rotation.x = 0;
 		camera.rotation.y = 0;
 		camera.rotation.z = 0;
@@ -95,6 +95,7 @@ $(document).ready(function() {
 			mesh[i].position.x = 476 - 160 * (i % 8);
 			mesh[i].position.y = 600 - 100 * Math.floor(i / 8);
 			mesh[i].rotation.x = 0;
+			mesh[i].private_sign = (Math.random() < .5 ? -1 : 1);
 			scene.add(mesh[i]);
 		};
 
@@ -161,6 +162,11 @@ $(document).ready(function() {
 			return current;
 		}
 
+		for (var i = 0; i < 128; i++) {
+			if (.1 < Math.abs(mesh[i].rotation.y))
+				mesh[i].private_sign = -mesh[i].private_sign;
+			mesh[i].rotation.y += ((mesh[i].private_sign * .12) - mesh[i].rotation.y) / 15;
+		}
 
 		camera.position.x = gotoTarget(camera.position.x, targetCamera.x);
 		camera.position.y = gotoTarget(camera.position.y, targetCamera.y);
@@ -199,6 +205,7 @@ $(document).ready(function() {
 			animMesh.push(INTERSECTED);
 		}
 		INTERSECTED = anIntersectedObj;
+		anIntersectedObj.private_sign = 0;
 		video.setAttribute('src', 'stream/' + INTERSECTED.name + '.mp4');
 		targetCamera.x = INTERSECTED.position.x;
 		targetCamera.y = INTERSECTED.position.y;
@@ -216,10 +223,11 @@ $(document).ready(function() {
 			INTERSECTED.material = savedMaterial;
 			animMesh.push(INTERSECTED);
 		}
+		INTERSECTED.private_sign = -1;
 		INTERSECTED = null;
 		video.pause();
 		video.setAttribute('src', '');
-		targetCamera.z = 500;
+		targetCamera.z = 800;
 	}
 
 	var findVideo = null;
@@ -279,14 +287,14 @@ $(document).ready(function() {
 			if (Math.abs(y - mousetrack.y) < 50)
 				targetCamera.y += (y - mousetrack.y) / 2;
 
-			if (500 < targetCamera.y)
-				targetCamera.y = 500;
-			if (targetCamera.y < -500)
-				targetCamera.y = -500;
-			if (targetCamera.x < -460)
-				targetCamera.x = -460;
-			if (300 < targetCamera.x)
-				targetCamera.x = 300;
+			if (450 < targetCamera.y)
+				targetCamera.y = 450;
+			if (targetCamera.y < -750)
+				targetCamera.y = -750;
+			if (targetCamera.x < -380)
+				targetCamera.x = -380;
+			if (200 < targetCamera.x)
+				targetCamera.x = 200;
 
 		}
 		mousetrack.x = x;
