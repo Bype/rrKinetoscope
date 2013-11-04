@@ -23,9 +23,47 @@
  *
  */
 
-var img_list = ["An_Impromptu_Session-Daft_Pianists", "Après_Barack_Obama,_François_Hollande_reprend_Get_Lucky_de_Daft_Punk_(ft_Pharrell)", "Barack_Obama_Singing_Get_Lucky_by_Daft_Punk_(ft._Pharrell)", "Billie_Jean_Get_Lucky_(Noy_Alooshe_Mash_Up)-Daft_Punk_Vs_Michael_Jackson", "Cat_Lucky", "C'est_bon_pour_le_moral", "CLIP_Evolution_of_Get_Lucky_[Daft_Punk_Chronologic_Cover]", "Daft_Punk_ft_Rodgers,_Pharrell_&_Jackson-DJ_Sandstorm_Mashup", "Daft_Punk_'Get_Lucky'_Covers_Mix_(@TheKevinRyder_remix)", "Être_Chanceux_(Get_Lucky_french_version)", "Evolution_of_Get_Lucky_[Daft_Punk_Chronologic_cover_by_PV_NOVA]", "Get_Lucky_(Acapella_&_Beatbox_Cover)", "Get_Lucky_(Acapella_Cover_by_Oliver_Age_24)", "Get_Lucky_-_A_Cappela_Cover-JB_Craipeau", "Get_Lucky_(Accordion_Cover_by_Olavsky)", "Get_Lucky_acoustic_cover_(tunisian_style)", "Get_Lucky_(A_cover_by_Andre_B.)", "Get_Lucky_-_Bass_Cover", "Get_Lucky_-_Beats_Antique_Cover_-_feat._Charles_Butler_-_Video_MasHuP", "Get_Lucky_(Chacarera)___Despiertos_para_ponerla_(HD)", "Get_Lucky-choir!_choir!_choir!_sings_Daft_Punk_(ft._Pharrell)", "Get_Lucky_cover_(Electronic_vs._Live_Instruments)_by_KNOWER", "Get_Lucky_(Daft_Punk_Cover)-Brett_Domino_Trio", "Get_Lucky_(Daft_Punk_ft._Pharrell)-The_Sons_of_Pitches", "Get_Lucky_-_feat._Charles_Butler_-_(Beats_Antique_Cover)", "Get_Lucky_(Full_Video)", "Get_Lucky-George_Barnett", "Get_Lucky_(Grand_Piano_Cover)", "Get_Lucky_LIVE_Cover_w__Looping", "Get_Lucky_(Miracles_of_Modern_Science_orchestral_cover)", "Get_Lucky", "GET_LUCKY", "Get_Lucky_Piano_Cover-Daft_Punk_Pianist", "Get_Lucky_-_Saxophone_Duet", "GET_LUCKY_-_SOUL_TRAIN_LINE_1970_-_2013", "Get_Lucky_vs._Bee_Gees_&_Justice", "Shredded_Version_(Parody_by_Topito.com)", "White_People_Dancing_to_Daft_Punk_(Get_Lucky)"];
+var img_list = ["An_Impromptu_Session-Daft_Pianists", "Après_Barack_Obama,_François_Hollande_reprend_Get_Lucky_de_Daft_Punk_(ft_Pharrell)", "Barack_Obama_Singing_Get_Lucky_by_Daft_Punk_(ft._Pharrell)", "Billie_Jean_Get_Lucky_(Noy_Alooshe_Mash_Up)-Daft_Punk_Vs_Michael_Jackson", "Cat_Lucky", "C'est_bon_pour_le_moral", "CLIP_Evolution_of_Get_Lucky_[Daft_Punk_Chronologic_Cover]", "Daft_Punk_ft_Rodgers,_Pharrell_&_Jackson-DJ_Sandstorm_Mashup", "Daft_Punk_'Get_Lucky'_Covers_Mix_(@TheKevinRyder_remix)", "Être_Chanceux_(Get_Lucky_french_version)", "Evolution_of_Get_Lucky_[Daft_Punk_Chronologic_cover_by_PV_NOVA]", "Get_Lucky_(Acapella_&_Beatbox_Cover)", "Get_Lucky_(Acapella_Cover_by_Oliver_Age_24)", "Get_Lucky_-_A_Cappela_Cover-JB_Craipeau", "Get_Lucky_(Accordion_Cover_by_Olavsky)", "Get_Lucky_acoustic_cover_(tunisian_style)", "Get_Lucky_(A_cover_by_Andre_B.)", "Get_Lucky_-_Bass_Cover", "Get_Lucky_-_Beats_Antique_Cover_-_feat._Charles_Butler_-_Video_MasHuP", "Get_Lucky_(Chacarera)___Despiertos_para_ponerla_(HD)", "Get_Lucky-choir!_choir!_choir!_sings_Daft_Punk_(ft._Pharrell)", "Get_Lucky_cover_(Electronic_vs._Live_Instruments)_by_KNOWER", "Get_Lucky_(Daft_Punk_Cover)-Brett_Domino_Trio", "Get_Lucky_(Daft_Punk_ft._Pharrell)-The_Sons_of_Pitches", "Get_Lucky_(Full_Video)", "Get_Lucky-George_Barnett", "Get_Lucky_(Grand_Piano_Cover)", "Get_Lucky_LIVE_Cover_w__Looping", "Get_Lucky_(Miracles_of_Modern_Science_orchestral_cover)", "Get_Lucky", "GET_LUCKY", "Get_Lucky_Piano_Cover-Daft_Punk_Pianist", "Get_Lucky_-_Saxophone_Duet", "GET_LUCKY_-_SOUL_TRAIN_LINE_1970_-_2013", "Get_Lucky_vs._Bee_Gees_&_Justice", "Shredded_Version_(Parody_by_Topito.com)", "White_People_Dancing_to_Daft_Punk_(Get_Lucky)"];
 
 $(document).ready(function() {
+
+	soundManager.setup({
+		url : 'swf',
+		flashVersion : 9, // optional: shiny features (default = 8)
+		preferFlash : true,
+		onready : function() {
+			soundManager.createSound({
+				id : 'loop',
+				url : 'audio/getLuckyLoop.mp3',
+				autoLoad : true,
+				autoPlay : true,
+				loops : 65536,
+				volume : 20
+			});
+		}
+	});
+
+	function fadeInSound(soundID, amount) {
+		var s = soundManager.getSoundById(soundID);
+		var vol = s.volume;
+		if (vol == 20)
+			return false;
+		s.setVolume(Math.min(20, vol + amount));
+		setTimeout(function() {
+			fadeInSound(soundID, amount)
+		}, 20);
+	}
+
+	function fadeOutSound(soundID, amount) {
+		var s = soundManager.getSoundById(soundID);
+		var vol = s.volume;
+		if (vol == 0)
+			return false;
+		s.setVolume(Math.max(0, vol + amount));
+		setTimeout(function() {
+			fadeOutSound(soundID, amount)
+		}, 20);
+	}
 
 	var camera, scene, renderer;
 	var material = new Array(img_list.length);
@@ -165,7 +203,7 @@ $(document).ready(function() {
 		for (var i = 0; i < 128; i++) {
 			if (.1 < Math.abs(mesh[i].rotation.y))
 				mesh[i].private_sign = -mesh[i].private_sign;
-			mesh[i].rotation.y += ((mesh[i].private_sign * .12) - mesh[i].rotation.y) / 15;
+			mesh[i].rotation.y += ((mesh[i].private_sign * .12) - mesh[i].rotation.y) / 14;
 		}
 
 		camera.position.x = gotoTarget(camera.position.x, targetCamera.x);
@@ -215,7 +253,7 @@ $(document).ready(function() {
 
 		if (video.paused)
 			video.play();
-
+		fadeOutSound('loop', -1);
 	}
 
 	function stopVideo() {
@@ -228,6 +266,7 @@ $(document).ready(function() {
 		video.pause();
 		video.setAttribute('src', '');
 		targetCamera.z = 800;
+		fadeInSound('loop', 1);
 	}
 
 	var findVideo = null;
