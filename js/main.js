@@ -250,7 +250,9 @@ $(document).ready(function() {
 		targetCamera.z = 260;
 		savedMaterial = INTERSECTED.material;
 		INTERSECTED.material = materialV;
-
+		video.addEventListener('ended', function(e) {
+			stopVideo();
+		},false);
 		if (video.paused)
 			video.play();
 		fadeOutSound('loop', -1);
