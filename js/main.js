@@ -50,7 +50,7 @@ $(document).ready(function() {
 			return false;
 		s.setVolume(Math.min(20, vol + amount));
 		setTimeout(function() {
-			fadeInSound(soundID, amount)
+			fadeInSound(soundID, amount);
 		}, 20);
 	}
 
@@ -61,7 +61,7 @@ $(document).ready(function() {
 			return false;
 		s.setVolume(Math.max(0, vol + amount));
 		setTimeout(function() {
-			fadeOutSound(soundID, amount)
+			fadeOutSound(soundID, amount);
 		}, 20);
 	}
 
